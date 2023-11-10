@@ -29,21 +29,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
         selectedWidget = reportWidget();
         break;
       case 'SETTINGS':
-        selectedWidget = settingsWidget();
+        selectedWidget = settingsWidget(context, widget.user!);
         break;
       default:
         selectedWidget = Container();
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: provider.darkTheme ? Colors.black : Colors.white,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 0,
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: provider.darkTheme ? Colors.black : Colors.white,
         title: Text(
           provider.currentBody,
-          style: const TextStyle(color: Colors.black),
+          style: TextStyle(
+              color: provider.darkTheme ? Colors.white : Colors.black),
         ),
       ),
       bottomNavigationBar: BottomAppBar(

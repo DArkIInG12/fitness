@@ -9,7 +9,9 @@ import 'package:provider/provider.dart';
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const MainApp());
+  runApp(ChangeNotifierProvider(
+      create: (BuildContext context) => ProviderModel(),
+      child: const MainApp()));
 }
 
 class MainApp extends StatelessWidget {
@@ -17,12 +19,11 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (BuildContext context) => ProviderModel(),
-      child: MaterialApp(
-        routes: getRoutes(),
-        home: LoginScreen(),
-      ),
+    var provider = Provider.of<ProviderModel>(context);
+    return MaterialApp(
+      routes: getRoutes(),
+      home: LoginScreen(),
+      theme: provider.darkTheme == true ? ThemeData.dark() : ThemeData.light(),
     );
   }
 }
