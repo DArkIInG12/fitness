@@ -177,6 +177,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   actions: [
                                                     TextButton(
                                                         onPressed: () {
+                                                          resPwdEmail.text = "";
+                                                          confirmResPwdEmail
+                                                              .text = "";
                                                           Navigator.pop(
                                                               context);
                                                         },
