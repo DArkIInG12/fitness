@@ -21,4 +21,11 @@ class ProviderModel with ChangeNotifier {
     _darkTheme = value;
     notifyListeners();
   }
+
+  bool _emailConfirmedPwd = false;
+  bool get emailConfirmedPwd => _emailConfirmedPwd;
+  set emailConfirmedPwd(bool value) {
+    _emailConfirmedPwd = value;
+    notifyListeners();
+  }
 }

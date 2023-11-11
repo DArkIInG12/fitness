@@ -24,4 +24,12 @@ class EmailAuth {
       return false;
     }
   }
+
+  Future<void> resetPassword(String email) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      print("Error al enviar el correo electrónico de restablecimiento: $e");
+    }
+  }
 }

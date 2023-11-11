@@ -55,7 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: flag == true
                             ? const Icon(
-                                Icons.check_circle_outline,
+                                Icons.check_circle_outline_outlined,
                                 color: Colors.green,
                               )
                             : const Icon(
@@ -85,7 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: flag == true
                             ? const Icon(
-                                Icons.check_circle_outline,
+                                Icons.check_circle_outline_outlined,
                                 color: Colors.green,
                               )
                             : const Icon(

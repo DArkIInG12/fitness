@@ -2,8 +2,10 @@ import 'package:fitness/firebase/email_auth.dart';
 import 'package:fitness/firebase/facebook_auth.dart';
 import 'package:fitness/firebase/github_auth.dart';
 import 'package:fitness/firebase/google_auth.dart';
+import 'package:fitness/provider.dart';
 import 'package:fitness/screens/dashboard_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +18,8 @@ class _LoginScreenState extends State<LoginScreen> {
   bool rememberMe = false;
   TextEditingController emailController = TextEditingController();
   TextEditingController pwdController = TextEditingController();
+  TextEditingController resPwdEmail = TextEditingController();
+  TextEditingController confirmResPwdEmail = TextEditingController();
 
   final emailAuth = EmailAuth();
   final gitAuth = GithubAuth();
@@ -24,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<ProviderModel>(context);
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -78,7 +83,117 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       //Expanded(child: Container()),
                       TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                      'Write and confirm your email address'),
+                                  content: SizedBox(
+                                    height: 110,
+                                    child: Column(
+                                      children: [
+                                        TextField(
+                                          decoration: InputDecoration(
+                                              suffixIcon:
+                                                  provider.emailConfirmedPwd
+                                                      ? const Icon(
+                                                          Icons
+                                                              .check_circle_outline_outlined,
+                                                          color: Colors.green,
+                                                        )
+                                                      : null,
+                                              hintText: "Email"),
+                                          controller: resPwdEmail,
+                                          onChanged: (value) {
+                                            if (resPwdEmail.text.isNotEmpty &&
+                                                confirmResPwdEmail
+                                                    .text.isNotEmpty) {
+                                              if (resPwdEmail.text ==
+                                                  confirmResPwdEmail.text) {
+                                                provider.emailConfirmedPwd =
+                                                    true;
+                                              } else {
+                                                provider.emailConfirmedPwd =
+                                                    false;
+                                              }
+                                            }
+                                          },
+                                        ),
+                                        TextField(
+                                          decoration: InputDecoration(
+                                              suffixIcon:
+                                                  provider.emailConfirmedPwd
+                                                      ? const Icon(
+                                                          Icons
+                                                              .check_circle_outline_outlined,
+                                                          color: Colors.green,
+                                                        )
+                                                      : null,
+                                              hintText: "Confirm Email"),
+                                          controller: confirmResPwdEmail,
+                                          onChanged: (value) {
+                                            if (resPwdEmail.text.isNotEmpty &&
+                                                confirmResPwdEmail
+                                                    .text.isNotEmpty) {
+                                              if (resPwdEmail.text ==
+                                                  confirmResPwdEmail.text) {
+                                                provider.emailConfirmedPwd =
+                                                    true;
+                                              } else {
+                                                provider.emailConfirmedPwd =
+                                                    false;
+                                              }
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        if (provider.emailConfirmedPwd) {
+                                          emailAuth
+                                              .resetPassword(resPwdEmail.text);
+                                          resPwdEmail.text = "";
+                                          confirmResPwdEmail.text = "";
+                                          Navigator.of(context).pop();
+                                        } else {
+                                          showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  title: const Text("Error"),
+                                                  content: const Text(
+                                                      "The emails not match"),
+                                                  actions: [
+                                                    TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child:
+                                                            const Text("Close"))
+                                                  ],
+                                                );
+                                              });
+                                        }
+                                      },
+                                      child: const Text('Send'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
                           child: const Text("Forgot password?"))
                     ],
                   ),

@@ -21,9 +21,12 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     var provider = Provider.of<ProviderModel>(context);
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       routes: getRoutes(),
       home: LoginScreen(),
       theme: provider.darkTheme == true ? ThemeData.dark() : ThemeData.light(),
     );
   }
 }
+
+//PROBAR OTRA CLASE DE PROVIDER PARA WIDGETS ESPECIFICOS
