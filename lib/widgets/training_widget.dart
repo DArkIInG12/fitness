@@ -4,9 +4,31 @@ import 'package:flutter/material.dart';
 
 List bodyParts = ["ABS", "CHEST", "ARM", "LEG", "SHOULDER & BACK"];
 Random number = Random();
+DateTime today = DateTime.now();
+
+getWeeksInCurrentMonth() {
+  DateTime firstDayOfMonth = DateTime(today.year, today.month, 1);
+  DateTime lastDayOfMonth = DateTime(today.year, today.month + 1, 0);
+  DateTime tempDay = firstDayOfMonth;
+
+  DateTime aux = DateTime(today.year, today.month, today.day);
+  print(aux);
+
+  print(firstDayOfMonth.day);
+  print(lastDayOfMonth.day);
+}
+
+List<int> getCurrentWeek() {
+  DateTime now = DateTime.now();
+  DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+  //DateTime endOfWeek = startOfWeek.add(const Duration(days: 6));
+
+  return List.generate(
+      7, (index) => startOfWeek.add(Duration(days: index)).day);
+}
 
 Widget trainingWidget() {
-  List days = [1, 2, 3, 4, 5, 6, 7];
+  List days = getCurrentWeek();
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,7 +93,6 @@ Widget trainingWidget() {
         margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
         width: double.infinity,
-        //color: Colors.grey,
         child: Column(
           children: [
             Row(
@@ -110,7 +131,9 @@ Widget trainingWidget() {
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: day == 4 ? Colors.blue : Colors.black),
+                              color: day == today.day
+                                  ? Colors.blue
+                                  : Colors.black),
                         ),
                       ),
                     ),
