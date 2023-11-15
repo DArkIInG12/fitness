@@ -1,21 +1,221 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:fitness/firebase/email_auth.dart';
+import 'package:fitness/firebase/google_auth.dart';
+import 'package:fitness/global_values.dart';
 import 'package:fitness/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+
+final emailAuth = EmailAuth();
+final googleAuth = GoogleAuth();
+final imagePicker = ImagePicker();
+
+List dropItems = [
+  "Set New Photo",
+  "View Photo",
+];
+
+String currentTopic = "Set New Photo";
+
+File? image;
+
+String? zeldaPhoto;
+
+Future getImage() async {
+  image = null;
+  final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+
+  if (pickedFile != null) {
+    image = File(pickedFile.path);
+  } else {
+    print('No image selected.');
+  }
+}
+
+Future uploadImageToFirebase(BuildContext context) async {
+  if (image == null) {
+    print('Select an image first');
+  } else {
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference storageReference =
+        storage.ref().child('profilePhotos/${DateTime.now()}.png');
+    UploadTask uploadTask = storageReference.putFile(image!);
+    await uploadTask;
+    if (uploadTask.snapshot.state == TaskState.success) {
+      String downloadURL = await storageReference.getDownloadURL();
+      print('Image uploaded successfully!');
+      zeldaPhoto = downloadURL;
+    } else {
+      print('Failed to upload image');
+    }
+  }
+}
+
+void deleteImageFromFirebase(String imageUrl) async {
+  FirebaseStorage storage = FirebaseStorage.instance;
+
+  Reference reference = storage.refFromURL(imageUrl);
+
+  try {
+    await reference.delete();
+    print('Imagen eliminada correctamente');
+  } catch (e) {
+    print('Error al eliminar la imagen: $e');
+  }
+}
 
 Widget settingsWidget(BuildContext context, User user) {
   var provider = Provider.of<ProviderModel>(context);
+  //user.updatePhotoURL(null);
+  var providerId = user.providerData[0].providerId;
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Center(
-          child: CircleAvatar(
-              radius: 50, backgroundImage: NetworkImage(user.photoURL!))),
+          child: user.photoURL != null
+              ? InkWell(
+                  onLongPress: () {
+                    print("user");
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            content: SizedBox(
+                              height: 98,
+                              child: Column(children: [
+                                providerId == 'password'
+                                    ? SizedBox(
+                                        width: double.infinity,
+                                        child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              getImage().then((value) {
+                                                uploadImageToFirebase(context)
+                                                    .then((value) {
+                                                  if (image != null) {
+                                                    if (provider.userPhoto !=
+                                                        "") {
+                                                      deleteImageFromFirebase(
+                                                          provider.userPhoto);
+                                                    } else {
+                                                      deleteImageFromFirebase(
+                                                          user.photoURL!);
+                                                    }
+                                                    user.updatePhotoURL(
+                                                        zeldaPhoto);
+                                                    provider.userPhoto =
+                                                        zeldaPhoto!;
+                                                  }
+                                                });
+                                              });
+                                            },
+                                            child: const Text("Set New Photo")),
+                                      )
+                                    : const SizedBox(),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        showModalBottomSheet(
+                                            context: context,
+                                            builder: (context) {
+                                              return provider.userPhoto == ""
+                                                  ? Image.network(
+                                                      user.photoURL!)
+                                                  : Image.network(
+                                                      provider.userPhoto);
+                                            });
+                                      },
+                                      child: const Text("View Photo")),
+                                )
+                              ]),
+                            ),
+                          );
+                        });
+                  },
+                  child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage: NetworkImage(provider.userPhoto == ''
+                          ? user.photoURL!
+                          : provider.userPhoto)),
+                )
+              : InkResponse(
+                  onLongPress: () {
+                    print("no user");
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            content: SizedBox(
+                              height: 98,
+                              child: Column(children: [
+                                providerId == 'password'
+                                    ? SizedBox(
+                                        width: double.infinity,
+                                        child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              getImage().then((value) {
+                                                uploadImageToFirebase(context)
+                                                    .then((value) {
+                                                  if (image != null) {
+                                                    if (provider.userPhoto !=
+                                                        "") {
+                                                      deleteImageFromFirebase(
+                                                          provider.userPhoto);
+                                                    }
+                                                    user.updatePhotoURL(
+                                                        zeldaPhoto);
+                                                    provider.userPhoto =
+                                                        zeldaPhoto!;
+                                                  }
+                                                });
+                                              });
+                                            },
+                                            child: const Text("Set New Photo")),
+                                      )
+                                    : const SizedBox(),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        showModalBottomSheet(
+                                            context: context,
+                                            builder: (context) {
+                                              return provider.userPhoto == ""
+                                                  ? Image.asset(
+                                                      'assets/images/nophoto.jpg')
+                                                  : Image.network(
+                                                      provider.userPhoto);
+                                            });
+                                      },
+                                      child: const Text("View Photo")),
+                                )
+                              ]),
+                            ),
+                          );
+                        });
+                  },
+                  child: provider.userPhoto == ""
+                      ? const CircleAvatar(
+                          radius: 50,
+                          backgroundImage:
+                              AssetImage('assets/images/nophoto.jpg'))
+                      : CircleAvatar(
+                          radius: 50,
+                          backgroundImage: NetworkImage(provider.userPhoto)),
+                )),
       const SizedBox(
         height: 10,
       ),
       Text(
-        user.displayName!,
+        user.displayName ?? "Unknown",
         style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
       ),
       const SizedBox(
@@ -90,7 +290,13 @@ Widget settingsWidget(BuildContext context, User user) {
             style: ButtonStyle(
                 maximumSize: MaterialStateProperty.all(
                     const Size(double.infinity, double.infinity))),
-            onPressed: () {},
+            onPressed: () {
+              emailAuth.signOut();
+              googleAuth.googleSignOut();
+              provider.userPhoto = '';
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/login');
+            },
             child: const Text("Sign out")),
       )
     ],

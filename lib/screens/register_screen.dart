@@ -10,6 +10,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   bool flag = false;
+  TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController pwdController = TextEditingController();
   TextEditingController confirmPwdController = TextEditingController();
@@ -41,6 +42,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Container(
                 padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
                 child: Column(children: [
+                  TextField(
+                    decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.person), hintText: "Name"),
+                    controller: nameController,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   TextField(
                     decoration: const InputDecoration(
                         prefixIcon: Icon(Icons.email_outlined),
@@ -112,6 +121,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       onPressed: () {
                         if (pwdController.text == confirmPwdController.text) {
                           emailAuth.createUser(
+                              name: nameController.text,
                               email: emailController.text,
                               pwd: pwdController.text);
                           Navigator.pop(context);

@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fitness/global_values.dart';
 import 'package:fitness/provider.dart';
 import 'package:fitness/widgets/report_widget.dart';
 import 'package:fitness/widgets/settings_widget.dart';
@@ -16,6 +17,11 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<ProviderModel>(context);

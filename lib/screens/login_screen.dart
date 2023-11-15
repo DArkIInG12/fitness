@@ -1,6 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness/firebase/email_auth.dart';
 import 'package:fitness/firebase/facebook_auth.dart';
-import 'package:fitness/firebase/github_auth.dart';
 import 'package:fitness/firebase/google_auth.dart';
 import 'package:fitness/provider.dart';
 import 'package:fitness/screens/dashboard_screen.dart';
@@ -22,7 +22,6 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController confirmResPwdEmail = TextEditingController();
 
   final emailAuth = EmailAuth();
-  final gitAuth = GithubAuth();
   final googleAuth = GoogleAuth();
   final facebookAuth = Facebook();
 
@@ -155,6 +154,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                     TextButton(
                                       onPressed: () {
                                         Navigator.of(context).pop();
+                                        resPwdEmail.text = "";
+                                        confirmResPwdEmail.text = "";
                                       },
                                       child: const Text('Cancel'),
                                     ),
@@ -177,9 +178,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   actions: [
                                                     TextButton(
                                                         onPressed: () {
-                                                          resPwdEmail.text = "";
-                                                          confirmResPwdEmail
-                                                              .text = "";
                                                           Navigator.pop(
                                                               context);
                                                         },
@@ -205,11 +203,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   ElevatedButton(
                       onPressed: () async {
-                        bool res = await emailAuth.validateUser(
+                        User? user = await emailAuth.validateUser(
                             email: emailController.text,
                             pwd: pwdController.text);
-                        if (res) {
-                          Navigator.pushNamed(context, '/dashboard');
+                        if (user != null) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DashboardScreen(
+                                        user: user,
+                                      )));
                         } else {
                           print("Credenciales No Invalidas");
                         }
@@ -296,31 +299,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                           child: Image.asset(
                             'assets/images/google.png',
-                            width: 23,
-                          )),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      ElevatedButton(
-                          style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(Colors.white),
-                              minimumSize:
-                                  MaterialStateProperty.all(const Size(50, 50)),
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(40)))),
-                          onPressed: () async {
-                            /* final user = await gitAuth.signInWithGitHub();
-                            if (user != null) {
-                              Navigator.pushNamed(context, '/dashboard');
-                            } else {
-                              print("Credenciales git invalidas");
-                            } */
-                          },
-                          child: Image.asset(
-                            'assets/images/github.png',
                             width: 23,
                           )),
                     ],

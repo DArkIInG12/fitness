@@ -23,4 +23,8 @@ class GoogleAuth {
 
     return user;
   }
+
+  Future googleSignOut() async {
+    await GoogleSignIn().signOut();
+  }
 }
