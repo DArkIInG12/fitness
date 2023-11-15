@@ -11,7 +11,7 @@ class DashboardScreen extends StatefulWidget {
   DashboardScreen({super.key, this.user});
   User? user;
 
-  @override
+  @override 
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
@@ -20,10 +20,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     var provider = Provider.of<ProviderModel>(context);
     Widget selectedWidget;
-
+ 
     switch (provider.currentBody) {
       case 'TRAINING':
-        selectedWidget = trainingWidget();
+        selectedWidget = trainingWidget(context);
         break;
       case 'REPORT':
         selectedWidget = reportWidget();
@@ -74,7 +74,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ? Colors.blue
                               : Colors.grey),
                     )
-                  ],
+                  ], 
                 ),
               ),
             )),
