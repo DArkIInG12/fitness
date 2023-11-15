@@ -1,2 +1,2 @@
 # fitness
-Aplicacion movil para entrenar en casa sin necesidad de equipo de pesas
+Aplicacion movil para entrenar con una rutina establecida sin necesidad de un instructor personal
