@@ -3,7 +3,6 @@ import 'package:fitness/firebase/messaging.dart';
 import 'package:fitness/global_values.dart';
 import 'package:fitness/provider.dart';
 import 'package:fitness/routes.dart';
-import 'package:fitness/screens/dashboard_screen.dart';
 import 'package:fitness/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
