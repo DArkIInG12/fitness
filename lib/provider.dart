@@ -15,6 +15,13 @@ class ProviderModel with ChangeNotifier {
     notifyListeners();
   }
 
+  String _userName = '';
+  String get userName => _userName;
+  set userName(String value) {
+    _userName = value;
+    notifyListeners();
+  }
+
   String _currentSettings = "";
   String get currentSettings => _currentSettings;
   set currentSettings(String value) {
@@ -43,13 +50,6 @@ class ProviderModel with ChangeNotifier {
   String get registerMessage => _registerMessage;
   set registerMessage(String value) {
     _registerMessage = value;
-    notifyListeners();
-  }
-
-  bool _darkTheme = false;
-  bool get darkTheme => _darkTheme;
-  set darkTheme(bool value) {
-    _darkTheme = value;
     notifyListeners();
   }
 

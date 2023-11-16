@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitness/firebase/email_auth.dart';
 import 'package:fitness/firebase/google_auth.dart';
-import 'package:fitness/global_values.dart';
 import 'package:fitness/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -72,6 +71,7 @@ Widget settingsWidget(BuildContext context, User user) {
   var provider = Provider.of<ProviderModel>(context);
   //user.updatePhotoURL(null);
   var providerId = user.providerData[0].providerId;
+  TextEditingController nameController = TextEditingController();
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
@@ -79,7 +79,6 @@ Widget settingsWidget(BuildContext context, User user) {
           child: user.photoURL != null
               ? InkWell(
                   onLongPress: () {
-                    print("user");
                     showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -146,7 +145,6 @@ Widget settingsWidget(BuildContext context, User user) {
                 )
               : InkResponse(
                   onLongPress: () {
-                    print("no user");
                     showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -214,9 +212,74 @@ Widget settingsWidget(BuildContext context, User user) {
       const SizedBox(
         height: 10,
       ),
-      Text(
-        user.displayName ?? "Unknown",
-        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+      InkWell(
+        onLongPress: () {
+          providerId == "password"
+              ? showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      content: SizedBox(
+                        height: 48,
+                        child: Column(children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title:
+                                              const Text("Type your new name"),
+                                          content: Container(
+                                            margin: const EdgeInsets.fromLTRB(
+                                                0, 20, 0, 0),
+                                            width: double.infinity,
+                                            height: 20,
+                                            child: TextField(
+                                              decoration: const InputDecoration(
+                                                  hintText: "Name"),
+                                              controller: nameController,
+                                            ),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('Cancel'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                user.updateDisplayName(
+                                                    nameController.text);
+                                                provider.userName =
+                                                    nameController.text;
+                                                nameController.text = "";
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('Save'),
+                                            )
+                                          ],
+                                        );
+                                      });
+                                },
+                                child: const Text("Set New Name")),
+                          ),
+                        ]),
+                      ),
+                    );
+                  })
+              : null;
+        },
+        child: Text(
+          provider.userName == ""
+              ? user.displayName ?? "Unknown"
+              : provider.userName,
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
       ),
       const SizedBox(
         height: 5,
@@ -294,6 +357,7 @@ Widget settingsWidget(BuildContext context, User user) {
               emailAuth.signOut();
               googleAuth.googleSignOut();
               provider.userPhoto = '';
+              provider.userName = '';
               Navigator.pop(context);
               Navigator.pushNamed(context, '/login');
             },

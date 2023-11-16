@@ -42,16 +42,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     return Scaffold(
-      backgroundColor: provider.darkTheme ? Colors.black : Colors.white,
+      backgroundColor:
+          GlobalValues.darkTheme.value ? Colors.black : Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0,
         centerTitle: true,
-        backgroundColor: provider.darkTheme ? Colors.black : Colors.white,
+        backgroundColor:
+            GlobalValues.darkTheme.value ? Colors.black : Colors.white,
         title: Text(
           provider.currentBody,
           style: TextStyle(
-              color: provider.darkTheme ? Colors.white : Colors.black),
+              color:
+                  GlobalValues.darkTheme.value ? Colors.white : Colors.black),
         ),
       ),
       bottomNavigationBar: BottomAppBar(

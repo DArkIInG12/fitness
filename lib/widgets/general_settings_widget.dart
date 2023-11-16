@@ -1,5 +1,6 @@
 import 'package:day_night_switcher/day_night_switcher.dart';
 import 'package:fitness/firebase/messaging.dart';
+import 'package:fitness/global_values.dart';
 import 'package:fitness/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -50,9 +51,13 @@ Widget generalSettings(BuildContext context) {
                   width: 80,
                   height: 50,
                   child: DayNightSwitcher(
-                    isDarkModeEnabled: provider.darkTheme,
+                    isDarkModeEnabled: GlobalValues.darkTheme.value,
                     onStateChanged: (isDarkModeEnabled) async {
-                      provider.darkTheme = !provider.darkTheme;
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      prefs.setBool('darkTheme', isDarkModeEnabled);
+                      GlobalValues.darkTheme.value =
+                          !GlobalValues.darkTheme.value;
                     },
                   ),
                 ),

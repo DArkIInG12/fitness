@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
 
 class GlobalValues {
-  static ValueNotifier<bool> flagState = ValueNotifier<bool>(true);
+  static ValueNotifier<bool> darkTheme = ValueNotifier<bool>(false);
 }

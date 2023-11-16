@@ -1,22 +1,11 @@
 import 'dart:math';
 
+import 'package:fitness/global_values.dart';
 import 'package:flutter/material.dart';
 
 List bodyParts = ["ABS", "CHEST", "ARM", "LEG", "SHOULDER & BACK"];
 Random number = Random();
 DateTime today = DateTime.now();
-
-getWeeksInCurrentMonth() {
-  DateTime firstDayOfMonth = DateTime(today.year, today.month, 1);
-  DateTime lastDayOfMonth = DateTime(today.year, today.month + 1, 0);
-  DateTime tempDay = firstDayOfMonth;
-
-  DateTime aux = DateTime(today.year, today.month, today.day);
-  print(aux);
-
-  print(firstDayOfMonth.day);
-  print(lastDayOfMonth.day);
-}
 
 List<int> getCurrentWeek() {
   DateTime now = DateTime.now();
@@ -99,7 +88,10 @@ Widget trainingWidget() {
               children: [
                 const Text(
                   "WEEK GOAL",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
                 ),
                 Expanded(child: Container()),
                 const Text(

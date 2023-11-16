@@ -1,3 +1,4 @@
+import 'package:fitness/global_values.dart';
 import 'package:fitness/provider.dart';
 import 'package:fitness/widgets/general_settings_widget.dart';
 import 'package:fitness/widgets/workout_settings_widget.dart';
@@ -30,15 +31,17 @@ class SettingsScreen extends StatelessWidget {
             },
             icon: Icon(
               Icons.arrow_back,
-              color: provider.darkTheme ? Colors.white : Colors.black,
+              color: GlobalValues.darkTheme.value ? Colors.white : Colors.black,
             )),
         elevation: 1,
-        backgroundColor: provider.darkTheme ? Colors.black : Colors.white,
+        backgroundColor:
+            GlobalValues.darkTheme.value ? Colors.black : Colors.white,
         centerTitle: true,
         title: Text(
           provider.currentSettings,
           style: TextStyle(
-              color: provider.darkTheme ? Colors.white : Colors.black),
+              color:
+                  GlobalValues.darkTheme.value ? Colors.white : Colors.black),
         ),
       ),
       body: selectedWidget,
