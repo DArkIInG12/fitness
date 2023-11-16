@@ -4,6 +4,7 @@ class ProviderModel with ChangeNotifier {
   String _currentBody = 'TRAINING';
   int _indexOld = 0, _indexNew = 0;
 
+
   String get currentBody => _currentBody;
   set currentBody(String value) {
     _currentBody = value;

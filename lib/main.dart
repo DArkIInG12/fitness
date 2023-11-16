@@ -20,7 +20,7 @@ class MainApp extends StatelessWidget {
       create: (BuildContext context) => ProviderModel(),
       child: MaterialApp(
         routes: getRoutes(),
-        home: LoginScreen(), 
+        home: LoginScreen(),  
       ),
     );
   }

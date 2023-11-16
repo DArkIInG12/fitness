@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fitness/models/exercise_model.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class CardExcercice extends StatelessWidget {
   CardExcercice({super.key, required this.model});
 

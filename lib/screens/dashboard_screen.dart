@@ -38,7 +38,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        elevation: 0,
+        elevation: 0, 
         centerTitle: true,
         backgroundColor: Colors.white,
         title: Text(
