@@ -1,5 +1,7 @@
 import 'package:fitness/firebase/email_auth.dart';
+import 'package:fitness/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -17,7 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final emailAuth = EmailAuth();
-
+    var provider = Provider.of<ProviderModel>(context);
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -39,6 +41,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(
                 height: 20,
               ),
+              provider.registerMessage != ""
+                  ? Container(
+                      margin: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                      padding: const EdgeInsets.all(10),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: const Color.fromRGBO(224, 71, 71, 0.875)),
+                      child: Center(
+                        child: Text(
+                          provider.registerMessage,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    )
+                  : Container(),
+              provider.registerMessage != ""
+                  ? const SizedBox(
+                      height: 10,
+                    )
+                  : const SizedBox(),
               Container(
                 padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
                 child: Column(children: [
@@ -106,8 +129,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: true,
                     onChanged: (value) {
                       setState(() {
-                        if (pwdController.text == confirmPwdController.text) {
-                          flag = true;
+                        if (pwdController.text != "" &&
+                            confirmPwdController.text != "") {
+                          if (pwdController.text == confirmPwdController.text) {
+                            flag = true;
+                          } else {
+                            flag = false;
+                          }
                         } else {
                           flag = false;
                         }
@@ -119,15 +147,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   ElevatedButton(
                       onPressed: () {
-                        if (pwdController.text == confirmPwdController.text) {
-                          emailAuth.createUser(
-                              name: nameController.text,
-                              email: emailController.text,
-                              pwd: pwdController.text);
-                          Navigator.pop(context);
+                        if (emailController.text != "") {
+                          if (flag) {
+                            if (pwdController.text.length > 9) {
+                              if (nameController.text.isNotEmpty) {
+                                if (pwdController.text ==
+                                    confirmPwdController.text) {
+                                  emailAuth.createUser(
+                                      name: nameController.text,
+                                      email: emailController.text,
+                                      pwd: pwdController.text);
+                                  provider.registerMessage = "";
+                                  Navigator.pop(context);
+                                } else {
+                                  provider.registerMessage =
+                                      "Passwords not match, try again";
+                                }
+                              } else {
+                                provider.registerMessage =
+                                    "Name field must not be empty";
+                              }
+                            } else {
+                              provider.registerMessage =
+                                  "Password must be at least 10 characters";
+                            }
+                          } else {
+                            provider.registerMessage =
+                                "Passwords are empty or not match";
+                          }
                         } else {
-                          print(
-                              "Las contraseñas no coinciden, intentalo de nuevo");
+                          provider.registerMessage =
+                              "The email field must not be empty";
                         }
                       },
                       style: ButtonStyle(

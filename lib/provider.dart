@@ -32,6 +32,20 @@ class ProviderModel with ChangeNotifier {
     notifyListeners();
   }
 
+  String _loginMessage = "";
+  String get loginMessage => _loginMessage;
+  set loginMessage(String value) {
+    _loginMessage = value;
+    notifyListeners();
+  }
+
+  String _registerMessage = "";
+  String get registerMessage => _registerMessage;
+  set registerMessage(String value) {
+    _registerMessage = value;
+    notifyListeners();
+  }
+
   bool _darkTheme = false;
   bool get darkTheme => _darkTheme;
   set darkTheme(bool value) {

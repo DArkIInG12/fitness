@@ -42,6 +42,27 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(
                 height: 20,
               ),
+              provider.loginMessage != ""
+                  ? Container(
+                      margin: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                      padding: const EdgeInsets.all(10),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: const Color.fromRGBO(224, 71, 71, 0.875)),
+                      child: Center(
+                        child: Text(
+                          provider.loginMessage,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    )
+                  : Container(),
+              provider.loginMessage != ""
+                  ? const SizedBox(
+                      height: 10,
+                    )
+                  : const SizedBox(),
               Container(
                 padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
                 child: Column(children: [
@@ -207,6 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             email: emailController.text,
                             pwd: pwdController.text);
                         if (user != null) {
+                          provider.loginMessage = "";
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -214,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         user: user,
                                       )));
                         } else {
-                          print("Credenciales No Invalidas");
+                          provider.loginMessage = "Invalid email or password";
                         }
                       },
                       style: ButtonStyle(
@@ -250,6 +272,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               var user =
                                   await facebookAuth.signInWithFacebook();
                               if (user != null) {
+                                provider.loginMessage = "";
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -257,10 +280,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                               user: user,
                                             )));
                               } else {
-                                print("Inicio de sesion cancelado");
+                                provider.loginMessage = "Login canceled";
                               }
                             } catch (e) {
-                              print('Error al iniciar sesion: $e');
+                              provider.loginMessage = "Failed to login: $e";
                             }
                           },
                           child: Image.asset(
@@ -284,6 +307,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             try {
                               var user = await googleAuth.signInWithGoogle();
                               if (user != null) {
+                                provider.loginMessage = "";
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -291,10 +315,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                               user: user,
                                             )));
                               } else {
-                                print("Inicio de sesion cancelado");
+                                provider.loginMessage = "Login canceled";
                               }
                             } catch (e) {
-                              print('Error al iniciar sesion: $e');
+                              provider.loginMessage = "Failed to login: $e";
                             }
                           },
                           child: Image.asset(
