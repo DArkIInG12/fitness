@@ -3,7 +3,7 @@ import 'package:fitness/firebase/messaging.dart';
 import 'package:fitness/global_values.dart';
 import 'package:fitness/provider.dart';
 import 'package:fitness/routes.dart';
-import 'package:fitness/screens/login_screen.dart';
+import 'package:fitness/screens/login_screen.dart'; 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,7 +30,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: GlobalValues.darkTheme,
+        valueListenable: GlobalValues.darkTheme, 
         builder: (context, value, _) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,

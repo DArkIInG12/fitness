@@ -229,6 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             pwd: pwdController.text);
                         if (user != null) {
                           provider.loginMessage = "";
+                          provider.currentUserEmail = user.email!;
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -273,6 +274,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   await facebookAuth.signInWithFacebook();
                               if (user != null) {
                                 provider.loginMessage = "";
+                                provider.currentUserEmail = user.email!;
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -308,6 +310,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               var user = await googleAuth.signInWithGoogle();
                               if (user != null) {
                                 provider.loginMessage = "";
+                                provider.currentUserEmail = user.email!;
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(

@@ -3,6 +3,39 @@ import 'package:flutter/material.dart';
 class ProviderModel with ChangeNotifier {
   String _currentBody = 'TRAINING';
   int _indexOld = 0, _indexNew = 0;
+  DateTime _selected = DateTime.now();
+  DateTime _focused = DateTime.now();
+
+  Map<DateTime, List<dynamic>> _datesmap = {};
+  Map<DateTime, List<dynamic>> get datesmap => _datesmap;
+  set datesmap(Map<DateTime, List<dynamic>> value) {
+    _datesmap = value;
+  }
+
+  DateTime get selected => _selected;
+  set selected(DateTime value) {
+    _selected = value;
+    notifyListeners();
+  }
+
+  DateTime get focused => _focused;
+  set focused(DateTime value) {
+    _focused = value;
+    notifyListeners();
+  }
+
+  List<dynamic> _listE = [];
+  List<dynamic> get listE => _listE;
+  set listE(List<dynamic> value) {
+    _listE = value;
+  }
+
+  String _currentUserEmail = '';
+  String get currentUserEmail => _currentUserEmail;
+  set currentUserEmail(String value) {
+    _currentUserEmail = value;
+    notifyListeners();
+  }
 
   String get currentBody => _currentBody;
   set currentBody(String value) {

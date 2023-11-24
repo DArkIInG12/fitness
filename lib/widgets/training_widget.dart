@@ -1,14 +1,25 @@
 import 'dart:math';
 
+import 'package:fitness/firebase/exercises.dart';
 import 'package:fitness/global_values.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fitness/models/exercise_model.dart';
 import 'package:fitness/network/apiE.dart';
+import 'package:fitness/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 List bodyParts = [];
 List<ExcerciceModel>? excercices;
+ExercisesFirebase? bd;
 ApiE? apiE;
+Map<DateTime, List<dynamic>> datesmap = {};
+
+List<dynamic> getDates(DateTime day) {
+  print(datesmap);
+  return datesmap[day] ?? [];
+}
 
 List imagesBodyPartsB = [
   'https://phantom-expansion.unidadeditorial.es/6504b0893c1b8924f0c15837975a4226/crop/0x31/2046x1183/resize/1200/f/jpg/assets/multimedia/imagenes/2022/07/15/16578777887898.jpg',
@@ -59,341 +70,408 @@ List<int> getCurrentWeek() {
 }
 
 Widget trainingWidget(context) {
+  var provider = Provider.of<ProviderModel>(context);
   List days = getCurrentWeek();
+  bd = ExercisesFirebase();
   apiE = ApiE();
-  return FutureBuilder(
-      future: apiE!.getBodyPartList(),
-      builder: (cintext, AsyncSnapshot snapshot) {
-        if (snapshot.hasData) {
-          bodyParts = snapshot.data;
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "21",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
+
+  return Column(
+    children: [
+      FutureBuilder(
+          future: bd!
+              .getDocsEquals('ejercicios', 'user', provider.currentUserEmail),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List<Map<String, dynamic>> datos = snapshot.data!;
+              double cal_total = 0;
+              double time = 0;
+              int cant = datos.length;
+              Map<DateTime, List> formateddates = {};
+              for (int i = 0; i < datos.length; i++) {
+                cal_total += double.parse(datos[i]['calories']);
+                time += datos[i]['time'];
+                final datee = DateTime.parse(datos[i]['date']
+                        .toString()
+                        .replaceRange(10, null, ' 00:00:00.000Z'))
+                    .toUtc();
+                formateddates.update(
+                  datee,
+                  (value) {
+                    value.add(datos[i]);
+                    return value;
+                  },
+                  ifAbsent: () => [datos[i]],
+                );
+              }
+              datesmap = formateddates;
+
+              return FutureBuilder(
+                  future: apiE!.getBodyPartList(),
+                  builder: (cintext, AsyncSnapshot snapshot) {
+                    if (snapshot.hasData) {
+                      bodyParts = snapshot.data;
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      cant.toString(),
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    const Text("WORKOUTS")
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      cal_total.toStringAsFixed(1),
+                                      style: const TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    const Text("CAL")
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      (time / 60).truncate().toString(),
+                                      style: const TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    const Text("MINUTE")
+                                  ],
+                                ),
+                              )
+                            ],
                           ),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text("WORKOUTS")
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "4512",
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text("KCAL")
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "195",
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text("MINUTES")
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: const Color.fromRGBO(243, 243, 243, 0.937)),
-                margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
-                width: double.infinity,
-                //color: Colors.grey,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        const Text(
-                          "WEEK GOAL",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        Expanded(child: Container()),
-                        const Text(
-                          "0/5",
-                          style: TextStyle(
-                              color: Colors.blue, fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    SizedBox(
-                      height: 30,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: days.map((day) {
-                          return Padding(
-                            padding: const EdgeInsets.all(1.0),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/calendar');
+                            },
                             child: Container(
-                              width: 30,
-                              height: 50,
                               decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(10),
                                   color: const Color.fromRGBO(
-                                      219, 219, 219, 0.929)),
-                              child: Center(
-                                child: Text(
-                                  day.toString(),
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: day == 4
-                                          ? Colors.blue
-                                          : Colors.black),
+                                      243, 243, 243, 0.937)),
+                              margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              padding:
+                                  const EdgeInsets.fromLTRB(20, 18, 20, 18),
+                              width: double.infinity,
+                              //color: Colors.grey,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: const Color.fromRGBO(
+                                        243, 243, 243, 0.937)),
+                                margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 18, 20, 18),
+                                width: double.infinity,
+                                child: TableCalendar(
+                                  eventLoader: getDates,
+                                  headerVisible: false,
+                                  firstDay: DateTime.utc(2023, 01, 01),
+                                  lastDay: DateTime.utc(2030, 12, 31),
+                                  focusedDay: DateTime.now(),
+                                  availableCalendarFormats: const {
+                                    CalendarFormat.week: 'Week',
+                                  },
+                                  calendarFormat: CalendarFormat.week,
+                                  startingDayOfWeek: StartingDayOfWeek.monday,
+                                  calendarStyle: const CalendarStyle(
+                                    todayDecoration: BoxDecoration(
+                                        color: Colors.orange,
+                                        shape: BoxShape.circle),
+                                  ),
                                 ),
                               ),
                             ),
-                          );
-                        }).toList(),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Container(
-                margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                width: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "BEGGINER",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    for (var i = 0; i < bodyParts.length; i++)
-                      GestureDetector(
-                        child: Container(
-                          width: double.infinity,
-                          height: 170,
-                          margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              image: DecorationImage(
-                                  opacity: 1.0,
-                                  fit: BoxFit.cover,
-                                  image: CachedNetworkImageProvider(
-                                      imagesBodyPartsB[i]))),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    Image.asset('assets/images/thunderB.png'),
-                                    Image.asset('assets/images/thunderW.png'),
-                                    Image.asset('assets/images/thunderW.png')
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  bodyParts[i].toString().toUpperCase(),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontSize: 26),
-                                ),
-                              ),
-                            ],
                           ),
-                        ),
-                        onTap: () {
-                          apiE!.getExcercices(bodyParts[i]).then((value) {
-                            excercices = value;
-                          }).whenComplete(() {
-                            Navigator.pushNamed(context, '/excercices',
-                                arguments: {
-                                  'bodyPart': bodyParts[i],
-                                  'list': excercices,
-                                  'img': imagesBodyPartsB[i]
-                                });
-                          });
-                        },
-                      ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    const Text(
-                      "INTERMEDIATE",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    for (var i = 0; i < bodyParts.length; i++)
-                      GestureDetector(
-                        child: Container(
-                          width: double.infinity,
-                          height: 170,
-                          margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              image: DecorationImage(
-                                  opacity: 1.0,
-                                  fit: BoxFit.cover,
-                                  image: CachedNetworkImageProvider(
-                                      imagesBodyPartsI[i]))),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    Image.asset('assets/images/thunderB.png'),
-                                    Image.asset('assets/images/thunderB.png'),
-                                    Image.asset('assets/images/thunderW.png')
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  bodyParts[i].toString().toUpperCase(),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontSize: 26),
-                                ),
-                              ),
-                            ],
+                          const SizedBox(
+                            height: 20,
                           ),
-                        ),
-                        onTap: () {
-                          apiE!.getExcercices(bodyParts[i]).then((value) {
-                            excercices = value;
-                          }).whenComplete(() {
-                            Navigator.pushNamed(context, '/excercices',
-                                arguments: {
-                                  'bodyPart': bodyParts[i],
-                                  'list': excercices,
-                                  'img': imagesBodyPartsI[i]
-                                });
-                          });
-                        },
-                      ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    const Text(
-                      "ADVANCED",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    for (var i = 0; i < bodyParts.length; i++)
-                      GestureDetector(
-                        child: Container(
-                          width: double.infinity,
-                          height: 170,
-                          margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              image: DecorationImage(
-                                  opacity: 1.0,
-                                  fit: BoxFit.cover,
-                                  image: CachedNetworkImageProvider(
-                                      imagesBodyPartsA[i]))),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    Image.asset('assets/images/thunderB.png'),
-                                    Image.asset('assets/images/thunderB.png'),
-                                    Image.asset('assets/images/thunderB.png')
-                                  ],
+                          Container(
+                            margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                            width: double.infinity,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "BEGGINER",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  bodyParts[i].toString().toUpperCase(),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontSize: 26),
+                                const SizedBox(
+                                  height: 10,
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        onTap: () {
-                          apiE!.getExcercices(bodyParts[i]).then((value) {
-                            excercices = value;
-                          }).whenComplete(() {
-                            Navigator.pushNamed(context, '/excercices',
-                                arguments: {
-                                  'bodyPart': bodyParts[i],
-                                  'list': excercices,
-                                  'img': imagesBodyPartsA[i]
-                                });
-                          });
-                        },
-                      ),
-                  ],
-                ),
-              )
-            ],
-          );
-        } else {
-          return const Text('No c logro :(');
-        }
-      });
+                                for (var i = 0; i < bodyParts.length; i++)
+                                  GestureDetector(
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 170,
+                                      margin: const EdgeInsets.fromLTRB(
+                                          0, 0, 0, 10),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          image: DecorationImage(
+                                              opacity: 1.0,
+                                              fit: BoxFit.cover,
+                                              image: CachedNetworkImageProvider(
+                                                  imagesBodyPartsB[i]))),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Row(
+                                              children: [
+                                                Image.asset(
+                                                    'assets/images/thunderB.png'),
+                                                Image.asset(
+                                                    'assets/images/thunderW.png'),
+                                                Image.asset(
+                                                    'assets/images/thunderW.png')
+                                              ],
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              bodyParts[i]
+                                                  .toString()
+                                                  .toUpperCase(),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  fontSize: 26),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      apiE!
+                                          .getExcercices(bodyParts[i])
+                                          .then((value) {
+                                        excercices = value;
+                                      }).whenComplete(() {
+                                        Navigator.pushNamed(
+                                            context, '/excercices',
+                                            arguments: {
+                                              'level': 'BEGGINER',
+                                              'bodyPart': bodyParts[i],
+                                              'list': excercices,
+                                              'img': imagesBodyPartsB[i]
+                                            });
+                                      });
+                                    },
+                                  ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                const Text(
+                                  "INTERMEDIATE",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                for (var i = 0; i < bodyParts.length; i++)
+                                  GestureDetector(
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 170,
+                                      margin: const EdgeInsets.fromLTRB(
+                                          0, 0, 0, 10),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          image: DecorationImage(
+                                              opacity: 1.0,
+                                              fit: BoxFit.cover,
+                                              image: CachedNetworkImageProvider(
+                                                  imagesBodyPartsI[i]))),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Row(
+                                              children: [
+                                                Image.asset(
+                                                    'assets/images/thunderB.png'),
+                                                Image.asset(
+                                                    'assets/images/thunderB.png'),
+                                                Image.asset(
+                                                    'assets/images/thunderW.png')
+                                              ],
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              bodyParts[i]
+                                                  .toString()
+                                                  .toUpperCase(),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  fontSize: 26),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      apiE!
+                                          .getExcercices(bodyParts[i])
+                                          .then((value) {
+                                        excercices = value;
+                                      }).whenComplete(() {
+                                        Navigator.pushNamed(
+                                            context, '/excercices',
+                                            arguments: {
+                                              'level': 'INTERMEDIATE',
+                                              'bodyPart': bodyParts[i],
+                                              'list': excercices,
+                                              'img': imagesBodyPartsI[i]
+                                            });
+                                      });
+                                    },
+                                  ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                const Text(
+                                  "ADVANCED",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                for (var i = 0; i < bodyParts.length; i++)
+                                  GestureDetector(
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 170,
+                                      margin: const EdgeInsets.fromLTRB(
+                                          0, 0, 0, 10),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          image: DecorationImage(
+                                              opacity: 1.0,
+                                              fit: BoxFit.cover,
+                                              image: CachedNetworkImageProvider(
+                                                  imagesBodyPartsA[i]))),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Row(
+                                              children: [
+                                                Image.asset(
+                                                    'assets/images/thunderB.png'),
+                                                Image.asset(
+                                                    'assets/images/thunderB.png'),
+                                                Image.asset(
+                                                    'assets/images/thunderB.png')
+                                              ],
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              bodyParts[i]
+                                                  .toString()
+                                                  .toUpperCase(),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  fontSize: 26),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      apiE!
+                                          .getExcercices(bodyParts[i])
+                                          .then((value) {
+                                        excercices = value;
+                                      }).whenComplete(() {
+                                        Navigator.pushNamed(
+                                            context, '/excercices',
+                                            arguments: {
+                                              'level': 'ADVANCED',
+                                              'bodyPart': bodyParts[i],
+                                              'list': excercices,
+                                              'img': imagesBodyPartsA[i]
+                                            });
+                                      });
+                                    },
+                                  ),
+                              ],
+                            ),
+                          )
+                        ],
+                      );
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  });
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          }),
+    ],
+  );
 }

@@ -68,6 +68,7 @@ void deleteImageFromFirebase(String imageUrl) async {
 }
 
 Widget settingsWidget(BuildContext context, User user) {
+  
   var provider = Provider.of<ProviderModel>(context);
   //user.updatePhotoURL(null);
   var providerId = user.providerData[0].providerId;
