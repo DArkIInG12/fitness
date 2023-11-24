@@ -8,15 +8,15 @@ import 'package:fitness/screens/register_screen.dart';
 import 'package:fitness/screens/settings_screen.dart';
 import 'package:flutter/widgets.dart';
 
-Map<String, WidgetBuilder> getRoutes() { 
+Map<String, WidgetBuilder> getRoutes() {
   return {
     '/login': (BuildContext context) => const LoginScreen(),
     '/register': (BuildContext context) => const RegisterScreen(),
     '/dashboard': (BuildContext context) => DashboardScreen(),
-    '/settings': (BuildContext context) => SettingsScreen(),
+    '/settings': (BuildContext context) => const SettingsScreen(),
     '/excercices': (BuildContext context) => const ExcercicesScreen(),
     '/coutdown': (BuildContext context) => const CountdownTimer(),
-    '/finalE': (BuildContext context)=> const FinalExcerciceScreen(),
+    '/finalE': (BuildContext context) => const FinalExcerciceScreen(),
     '/calendar': (BuildContext context) => const CalendarScreen()
   };
 }
