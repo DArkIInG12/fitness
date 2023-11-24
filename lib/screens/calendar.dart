@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fitness/firebase/exercises.dart';
 import 'package:fitness/provider.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,63 @@ class _CalendarScreenState extends State<CalendarScreen> {
   DateTime? selectedDay;
   DateTime focusedDay = DateTime.now();
 
+    String timeparse(int seconds) {
+    if (seconds <= 9) {
+      return '00:0$seconds';
+    } else if (seconds > 9 && seconds <= 60) {
+      return '00:$seconds';
+    } else {
+      int residuo = seconds % 60;
+      int minutes = (seconds / 60).truncate();
+      if (residuo > 9 && minutes > 9) {
+        return '$minutes:$residuo';
+      } else if (residuo <= 9 && minutes > 9) {
+        return '$minutes:0$residuo';
+      } else if (residuo > 9 && minutes < 9) {
+        return '0$minutes:$residuo';
+      } else {
+        return '0$minutes:0$residuo';
+      }
+    }
+  }
+
+  Map <String,String> ibegginer ={
+  'back':'https://phantom-expansion.unidadeditorial.es/6504b0893c1b8924f0c15837975a4226/crop/0x31/2046x1183/resize/1200/f/jpg/assets/multimedia/imagenes/2022/07/15/16578777887898.jpg',
+  'cardio':'https://i.blogs.es/63eb96/istock-1212303707/1366_2000.jpeg',
+  'chest':'https://entrenamientosfuncionales.com/wp-content/uploads/2022/06/ejercicios-para-aumentar-pecho-hombre-flexiones-straggered.jpg',
+  'lower arms':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFOAE0rE_CHZT_7UyfIPlwU8_1vYwcsRparw&usqp=CAU',
+  'lower legs':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAa2s7ngLBSYcDtf23TT6XfTM9EIS2v74SRA&usqp=CAU',
+  'neck':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmMxKEA_rfJsx_O67XObm-pm787sLTV8BxqA&usqp=CAU',
+  'shoulders':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpp6P1lwFaMVCsy9jzM_0fOUSV2uuQfLERUw&usqp=CAU',
+  'upper arms':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSb2VTIPGE4Lhu3Ig63wWp4pU7d0g8MN1rjPQ&usqp=CAU',
+  'upper legs':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqZeZ9wTZnXchsJ7P9_Kd6hTV3pKVF3wCQcg&usqp=CAU',
+  'waist':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQPZiqaRvXtYJYZruwtf8cJfWEul0Y2EfI6WLYOvz4cdv9lFiTB4BjtT2u53gFV6sDd6RE&usqp=CAU'
+  };
+  Map <String,String> iintermediate = {
+  'back':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRorS1qaDlIrDlcileWutpk7sBfcypQ1gsqJXY0czoVU53YqZRZQbyxRq1swFpbfEzndHI&usqp=CAU',
+  'cardio':'https://i.blogs.es/ce0b48/650_1000_eliptica-correr/650_1200.jpg',
+  'chest':'https://images.ecestaticos.com/ceWCtDSWSxyo9OFLTEwOC_-aXe4=/0x0:0x0/1200x900/filters:fill(white):format(jpg)/f.elconfidencial.com%2Foriginal%2F572%2F679%2F17e%2F57267917e552e4d4474852040d7f390b.jpg',
+  'lower arms':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScmwiV-1TxvLeg-xHrrijZQLULQkB8nCoyHA&usqp=CAU',
+  'lower legs':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4bvVnQ70FVF93B3NAcGXsmpY4jM_6KSVvQg&usqp=CAU',
+  'neck':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUqL0ipkbEgpoYlGGMT9P3TxlZNhM3bC5SuA&usqp=CAU',
+  'shoulders':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnkVv4bnp1oVIg5S-gbaYtOTf26pNhwiC-ow&usqp=CAU',
+  'upper arms':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzmq5f7mGvSSE9JnY0l7EGgDhX7ZT69E6OKA&usqp=CAU',
+  'upper legs':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQl-pl_mIBlULQ4oon7RW6F0hXVwPRPkEUCnw&usqp=CAU',
+  'waist':'https://i.blogs.es/3573e1/istock_000073977019_medium/1366_2000.jpeg'
+  };
+  Map <String,String> iadvanced ={
+  'back':'https://as01.epimg.net/deporteyvida/imagenes/2020/11/11/portada/1605082637_497921_1605082754_noticia_normal_recorte1.jpg',
+  'cardio':'https://weriselatam.com/wp-content/uploads/2021/04/cardio-antes-de-pesas-800x500.jpg',
+  'chest':'https://entrenar.me/blog/wp-content/uploads/2018/03/flexiones-para-pectorales.jpg',
+  'lower arms':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrOFt4nlH6woVhrWb_csE4v2mYccs63mWH3w&usqp=CAU',
+  'lower legs':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLqbpVQjHUnW-sZ_tQHqNEO6sd-ab7Pq-acg&usqp=CAU',
+  'neck':'https://www.muscleandfitness.com/wp-content/uploads/2016/04/wide-neck.jpg?quality=86&strip=all',
+  'shoulders':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjaYgy9ka5wYivFoWWZ2tHILqZmg14GahKyQ&usqp=CAU',
+  'upper arms':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQj0ta_eJv_9Ud4s1qkk7-mONzpgG1S7uxivQ&usqp=CAU',
+  'upper legs':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqohBH-nQqhzGr0LA_xYI7PSyLuDR6w5Kgwx2voqsB0-TeEyzw8aXpcOSMtYQb8oWrO1o&usqp=CAU',
+  'waist':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUf_pXAVIkiOMU7hkGq0XLgAT3YNsB5kV_9g&usqp=CAU'
+
+  };
   List<dynamic> getDates(DateTime day) {
     print(datesmap);
     return datesmap[day] ?? [];
@@ -125,6 +183,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               itemCount: datos.length,
                               shrinkWrap: true,
                               itemBuilder: (context, index) {
+                                var mapI = '';
+                                switch (datos[index]['level']){
+                                  case 'BEGGINER':
+                                    mapI = ibegginer['${datos[index]['bodyPart']}']!;
+                                  case 'INTERMEDIATE':
+                                    mapI = iintermediate['${datos[index]['bodyPart']}']!;
+                                  case 'ADVANCED':
+                                    mapI = iadvanced['${datos[index]['bodyPart']}']!;
+                                }
                                 return Container(
                                   margin: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 4),
@@ -133,11 +200,32 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Card(
-                                    child: Column(
+                                    child: Row(
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
+                                        const SizedBox(width: 5,),
+                                        Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          children: [
+                                            SizedBox(
+                                              height: 100,
+                                              width: 150,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(10.0),
+                                                child: Image(image: CachedNetworkImageProvider(mapI),
+                                                  fit: BoxFit.cover,
+                                                  ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(width: 5,),
+                                        Column(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
                                           datos[index]['date'],
                                           style: const TextStyle(
                                               fontSize: 12),
@@ -156,6 +244,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
+                                        Row(
+                                          children: [
+                                           Image.asset('assets/images/clock_blue.png', width: 10,),
+                                           const SizedBox(width: 5,),
+                                           Text('${timeparse(datos[index]['time'])} min',
+                                            style:const TextStyle(fontWeight: FontWeight.bold) ,),
+                                          const SizedBox(width: 10,),
+                                           Image.asset('assets/images/redflame.png', width: 10,),
+                                           const SizedBox(width: 5,),
+                                           Text('${datos[index]['calories']} cal',
+                                            style:const TextStyle(fontWeight: FontWeight.bold) ,),
+                                       
+                                          ],
+                                        )
+                                          ],
+                                        )
+
                                       ],
                                     ),
                                   ),

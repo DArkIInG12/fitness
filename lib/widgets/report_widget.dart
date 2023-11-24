@@ -23,6 +23,7 @@ Widget reportWidget(ProviderModel prov) {
           double time = 0;
           int cant = datos.length;
           Map<String, int> contBodyPart = {};
+          Map<String, double> plusTime = {};
           Map<DateTime, List> formateddates = {};
           List<String> dates = [];
           for (int i = 0; i < datos.length; i++) {
@@ -35,6 +36,13 @@ Widget reportWidget(ProviderModel prov) {
             } else {
               contBodyPart[bodyPart] = 1;
             }
+
+            if (plusTime.containsKey(bodyPart)) {
+              plusTime[bodyPart] = plusTime[bodyPart]! + double.parse(datos[i]['time'].toString());
+            } else {
+              plusTime[bodyPart] = double.parse(datos[i]['time'].toString());
+            }
+
             final datee = DateTime.parse(datos[i]['date']
                     .toString()
                     .replaceRange(10, null, ' 00:00:00.000Z'))
@@ -176,7 +184,38 @@ Widget reportWidget(ProviderModel prov) {
                         ))
                   ],
                 ),
-              )
+              ),
+              const SizedBox(height: 20,),
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: const Color.fromRGBO(243, 243, 243, 0.937)),
+                width: double.infinity,
+                child: SfCartesianChart(
+                  primaryXAxis: CategoryAxis(),
+                  primaryYAxis: NumericAxis(minimum: 0, maximum: 500, interval: 20),
+                  title: ChartTitle(
+                      text: 'Body Part Exercises Time Worked',
+                      textStyle: const TextStyle(
+                          fontSize: 17, fontWeight: FontWeight.bold)),
+                  legend: const Legend(
+                      isVisible: false,
+                      overflowMode: LegendItemOverflowMode.wrap),
+                  tooltipBehavior: tooltipBehavior,
+                  series: <ChartSeries>[
+                    ColumnSeries<GDBData, String>(
+                        color: const Color.fromRGBO(199, 0, 57, 1),
+                        dataSource: getBarData(plusTime),
+                        xValueMapper: (GDBData data, _) =>
+                            data.field.toUpperCase(),
+                        yValueMapper: (GDBData data, _) => data.value,
+                        dataLabelSettings: const DataLabelSettings(
+                          isVisible: true,
+                        ))
+                  ],
+                ),
+              ),
+
             ],
           );
         } else {
@@ -197,8 +236,24 @@ List<GDCData> getCircularData(Map<String, int> map) {
   return data;
 }
 
+List<GDBData> getBarData(Map<String, double> map) {
+  List<GDBData> data = [];
+  Iterable<String> keys = map.keys;
+  for (final key in keys) {
+    data.add(GDBData(key, map[key]!));
+  }
+
+  return data;
+}
+
 class GDCData {
   GDCData(this.field, this.value);
   final String field;
   final int value;
+}
+
+class GDBData {
+  GDBData(this.field, this.value);
+  final String field;
+  final double value;
 }
