@@ -3,7 +3,8 @@ import 'package:fitness/firebase/messaging.dart';
 import 'package:fitness/global_values.dart';
 import 'package:fitness/provider.dart';
 import 'package:fitness/routes.dart';
-import 'package:fitness/screens/login_screen.dart'; 
+import 'package:fitness/screens/login_screen.dart';
+import 'package:fitness/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +20,12 @@ Future main() async {
     prefs.setBool('darkTheme', false);
     GlobalValues.darkTheme.value = prefs.getBool('darkTheme')!;
   }
+  if (prefs.containsKey('firstTime')) {
+    GlobalValues.firstTime.value = prefs.getBool('firstTime')!;
+  } else {
+    prefs.setBool('firstTime', true);
+    GlobalValues.firstTime.value = prefs.getBool('firstTime')!;
+  }
   runApp(ChangeNotifierProvider(
       create: (BuildContext context) => ProviderModel(),
       child: const MainApp()));
@@ -30,12 +37,14 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: GlobalValues.darkTheme, 
+        valueListenable: GlobalValues.darkTheme,
         builder: (context, value, _) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             routes: getRoutes(),
-            home: const LoginScreen(),
+            home: GlobalValues.firstTime.value
+                ? const OnboardingScreen()
+                : const LoginScreen(),
             theme: value == true ? ThemeData.dark() : ThemeData.light(),
           );
         });
