@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ProviderModel with ChangeNotifier {
@@ -6,6 +7,12 @@ class ProviderModel with ChangeNotifier {
   DateTime _selected = DateTime.now();
   DateTime _focused = DateTime.now();
   bool _darkmode = false;
+
+  User? _currentUser;
+  User get currentUser => _currentUser!;
+  set currentUser(User value) {
+    _currentUser = value;
+  }
 
   Map<DateTime, List<dynamic>> _datesmap = {};
   Map<DateTime, List<dynamic>> get datesmap => _datesmap;

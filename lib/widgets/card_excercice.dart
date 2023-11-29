@@ -19,7 +19,7 @@ class CardExcercice extends StatelessWidget {
       case 'ADVANCED':
         return Random().nextInt(60 - 55) + 55;
       default:
-        return 0;
+        return 25;
     }
   }
 

@@ -34,7 +34,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         selectedWidget = reportWidget(provider);
         break;
       case 'SETTINGS':
-        selectedWidget = settingsWidget(context, widget.user!);
+        selectedWidget = settingsWidget(context, provider.currentUser);
         break;
       default:
         selectedWidget = Container();

@@ -230,6 +230,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         if (user != null) {
                           provider.loginMessage = "";
                           provider.currentUserEmail = user.email!;
+                          provider.currentUser = user;
+                          provider.notifyListeners();
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -275,6 +277,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (user != null) {
                                 provider.loginMessage = "";
                                 provider.currentUserEmail = user.email!;
+                                provider.currentUser = user;
+                                provider.notifyListeners();
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -311,6 +315,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (user != null) {
                                 provider.loginMessage = "";
                                 provider.currentUserEmail = user.email!;
+                                provider.currentUser = user;
+                                provider.notifyListeners();
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
