@@ -38,7 +38,7 @@ class CardExcercice extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Icon(Icons.list_rounded),
+          const Icon(Icons.list_rounded,color: Colors.deepPurple),
           const SizedBox(
             width: 15,
           ),
@@ -55,13 +55,15 @@ class CardExcercice extends StatelessWidget {
               children: [
                 Text(model.name!.toUpperCase(),
                     style: const TextStyle(
+                        color: Colors.black,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                         overflow: TextOverflow.fade)),
                 const SizedBox(
                   height: 10,
                 ),
-                Text('x ${model.reps!.toString()} '),
+                Text('x ${model.reps!.toString()}',
+                style: const TextStyle(color: Colors.black),),
               ],
             ),
           )

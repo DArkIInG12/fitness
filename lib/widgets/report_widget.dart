@@ -1,8 +1,10 @@
 import 'package:fitness/firebase/exercises.dart';
+import 'package:fitness/global_values.dart';
 import 'package:fitness/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'dart:math' as math;
 
 Widget reportWidget(ProviderModel prov) {
   Map<DateTime, List<dynamic>> datesmap = {};
@@ -22,23 +24,29 @@ Widget reportWidget(ProviderModel prov) {
           double cal_total = 0;
           double time = 0;
           int cant = datos.length;
-          Map<String, int> contBodyPart = {};
+          Map<String, double> contBodyPart = {};
           Map<String, double> plusTime = {};
           Map<DateTime, List> formateddates = {};
           List<String> dates = [];
+          Map<String, Color> colors = {};
           for (int i = 0; i < datos.length; i++) {
             cal_total += double.parse(datos[i]['calories']);
             time += datos[i]['time'];
             dates.add(datos[i]['date']);
             String bodyPart = datos[i]['bodyPart'];
             if (contBodyPart.containsKey(bodyPart)) {
-              contBodyPart[bodyPart] = contBodyPart[bodyPart]! + 1;
+              contBodyPart[bodyPart] =
+                  contBodyPart[bodyPart]! + 1;
             } else {
               contBodyPart[bodyPart] = 1;
+              colors[bodyPart] =
+                  (Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
+                      .withOpacity(1.0));
             }
 
             if (plusTime.containsKey(bodyPart)) {
-              plusTime[bodyPart] = plusTime[bodyPart]! + double.parse(datos[i]['time'].toString());
+              plusTime[bodyPart] = plusTime[bodyPart]! +
+                  double.parse(datos[i]['time'].toString());
             } else {
               plusTime[bodyPart] = double.parse(datos[i]['time'].toString());
             }
@@ -57,13 +65,18 @@ Widget reportWidget(ProviderModel prov) {
             );
           }
           datesmap = formateddates;
+          Color? color;
+          if (GlobalValues.darkTheme == ValueNotifier<bool>(false)) {
+            color = const Color.fromRGBO(243, 243, 243, 0.937);
+          } else {
+            color = const Color.fromRGBO(243, 243, 243, 0.137);
+          }
 
           return Column(
             children: [
               Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: const Color.fromRGBO(243, 243, 243, 0.937)),
+                    borderRadius: BorderRadius.circular(10), color: color),
                 margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                 padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
                 width: double.infinity,
@@ -135,8 +148,7 @@ Widget reportWidget(ProviderModel prov) {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: const Color.fromRGBO(243, 243, 243, 0.937)),
+                      borderRadius: BorderRadius.circular(10), color: color),
                   margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                   padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
                   width: double.infinity,
@@ -161,61 +173,86 @@ Widget reportWidget(ProviderModel prov) {
               const SizedBox(height: 20),
               Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: const Color.fromRGBO(243, 243, 243, 0.937)),
+                    borderRadius: BorderRadius.circular(10), color: color),
                 width: double.infinity,
                 child: SfCircularChart(
+                  annotations: [
+                    CircularChartAnnotation(
+                        height: '100%',
+                        width: '100%',
+                        widget: PhysicalModel(
+                          color: color,
+                          shape: BoxShape.circle,
+                          elevation: 10,
+                          child: Container(),
+                        )),
+                    CircularChartAnnotation(
+                        widget: Center(
+                          child: Text(datos.length.toString(),
+                            style: const TextStyle(fontWeight: FontWeight.bold,
+                              fontSize: 20),),
+                        ))
+                  ],
                   title: ChartTitle(
-                      text: 'Body Part Exercises',
+                      text: 'Body Part Exercises Number',
                       textStyle: const TextStyle(
                           fontSize: 17, fontWeight: FontWeight.bold)),
                   legend: const Legend(
                       isVisible: true,
+                      title: LegendTitle(
+                          text: 'BODY PARTS',
+                          textStyle: TextStyle(fontWeight: FontWeight.bold)),
                       overflowMode: LegendItemOverflowMode.wrap),
                   tooltipBehavior: tooltipBehavior,
                   series: <CircularSeries>[
                     DoughnutSeries<GDCData, String>(
-                        dataSource: getCircularData(contBodyPart),
+                        dataSource: getCircularData(contBodyPart, colors),
                         xValueMapper: (GDCData data, _) =>
                             data.field.toUpperCase(),
                         yValueMapper: (GDCData data, _) => data.value,
+                        pointColorMapper: (GDCData data, _) => data.color,
+                        dataLabelMapper: (GDCData data, _) =>
+                            data.value.toStringAsFixed(0),
                         dataLabelSettings: const DataLabelSettings(
-                          isVisible: true,
-                        ))
+                            isVisible: true, useSeriesColor: true))
                   ],
                 ),
               ),
-              const SizedBox(height: 20,),
+              const SizedBox(
+                height: 20,
+              ),
               Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: const Color.fromRGBO(243, 243, 243, 0.937)),
+                    borderRadius: BorderRadius.circular(10), color: color),
                 width: double.infinity,
                 child: SfCartesianChart(
-                  primaryXAxis: CategoryAxis(),
-                  primaryYAxis: NumericAxis(minimum: 0, maximum: 500, interval: 20),
+                  primaryXAxis: CategoryAxis(arrangeByIndex: true,
+                    labelsExtent: 20),
+                  primaryYAxis:
+                      NumericAxis(minimum: 0, maximum: 30, interval: 5, title:AxisTitle(text: 'Minutes')),
                   title: ChartTitle(
                       text: 'Body Part Exercises Time Worked',
                       textStyle: const TextStyle(
                           fontSize: 17, fontWeight: FontWeight.bold)),
                   legend: const Legend(
                       isVisible: false,
-                      overflowMode: LegendItemOverflowMode.wrap),
+                      overflowMode: LegendItemOverflowMode.none),
                   tooltipBehavior: tooltipBehavior,
                   series: <ChartSeries>[
                     ColumnSeries<GDBData, String>(
-                        color: const Color.fromRGBO(199, 0, 57, 1),
-                        dataSource: getBarData(plusTime),
+                        dataSource: getBarData(plusTime, colors),
                         xValueMapper: (GDBData data, _) =>
                             data.field.toUpperCase(),
-                        yValueMapper: (GDBData data, _) => data.value,
+                        yValueMapper: (GDBData data, _) => data.value / 60,
+                        pointColorMapper: (GDBData data, _) => data.color,
+                        dataLabelMapper: (GDBData data, _) =>
+                            '${timeparse(data.value.toInt())}',
                         dataLabelSettings: const DataLabelSettings(
-                          isVisible: true,
-                        ))
+                            isVisible: true, useSeriesColor: true,offset: Offset.zero,borderWidth: 1 
+                            ))
                   ],
                 ),
               ),
-
             ],
           );
         } else {
@@ -226,34 +263,58 @@ Widget reportWidget(ProviderModel prov) {
       });
 }
 
-List<GDCData> getCircularData(Map<String, int> map) {
+List<GDCData> getCircularData(
+    Map<String, double> map, Map<String, Color> mapColors) {
   List<GDCData> data = [];
   Iterable<String> keys = map.keys;
   for (final key in keys) {
-    data.add(GDCData(key, map[key]!));
+    data.add(GDCData(key, map[key]!, mapColors[key]!));
   }
 
   return data;
 }
 
-List<GDBData> getBarData(Map<String, double> map) {
+String timeparse(int seconds) {
+  if (seconds <= 9) {
+    return '00:0$seconds';
+  } else if (seconds > 9 && seconds <= 60) {
+    return '00:$seconds';
+  } else {
+    int residuo = seconds % 60;
+    int minutes = (seconds / 60).truncate();
+    if (residuo > 9 && minutes > 9) {
+      return '$minutes:$residuo';
+    } else if (residuo <= 9 && minutes > 9) {
+      return '$minutes:0$residuo';
+    } else if (residuo > 9 && minutes < 9) {
+      return '0$minutes:$residuo';
+    } else {
+      return '0$minutes:0$residuo';
+    }
+  }
+}
+
+List<GDBData> getBarData(
+    Map<String, double> map, Map<String, Color> mapColors) {
   List<GDBData> data = [];
   Iterable<String> keys = map.keys;
   for (final key in keys) {
-    data.add(GDBData(key, map[key]!));
+    data.add(GDBData(key, map[key]!, mapColors[key]!));
   }
 
   return data;
 }
 
 class GDCData {
-  GDCData(this.field, this.value);
+  GDCData(this.field, this.value, this.color);
   final String field;
-  final int value;
+  final double value;
+  final Color color;
 }
 
 class GDBData {
-  GDBData(this.field, this.value);
+  GDBData(this.field, this.value, this.color);
   final String field;
   final double value;
+  final Color color;
 }

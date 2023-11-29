@@ -25,4 +25,21 @@ class ExercisesFirebase {
 
     return list;
   }
+
+    Future<List<Map<String, dynamic>>> getDocsEqualsLImit(
+      String colection, String field, String value,int limit) async {
+    CollectionReference collection =
+        FirebaseFirestore.instance.collection(colection);
+
+    QuerySnapshot snapshot =
+        await collection.where(field, isEqualTo: value).orderBy('date' ,descending: true).limit(limit).get();
+    List<Map<String, dynamic>> list =
+        snapshot.docs.map((DocumentSnapshot document) {
+      return document.data() as Map<String, dynamic>;
+    }).toList();
+
+    return list;
+  }
+
+
 }

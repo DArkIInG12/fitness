@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fitness/firebase/exercises.dart';
+import 'package:fitness/global_values.dart';
 import 'package:fitness/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -98,7 +99,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       DeviceOrientation.portraitDown,
     ]);
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: GlobalValues.darkTheme.value ? Colors.black : Colors.white,
         body: NestedScrollView(
             headerSliverBuilder:
                 (BuildContext context, bool innerBoxIsScrolled) {

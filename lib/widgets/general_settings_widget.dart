@@ -58,6 +58,8 @@ Widget generalSettings(BuildContext context) {
                       prefs.setBool('darkTheme', isDarkModeEnabled);
                       GlobalValues.darkTheme.value =
                           !GlobalValues.darkTheme.value;
+                      provider.darkmode = !provider.darkmode;
+                      provider.notifyListeners();
                     },
                   ),
                 ),

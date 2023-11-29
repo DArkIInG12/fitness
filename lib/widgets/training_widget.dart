@@ -105,6 +105,13 @@ Widget trainingWidget(context) {
               }
               datesmap = formateddates;
 
+              Color? color;
+              if (GlobalValues.darkTheme == ValueNotifier<bool>(false)) {
+                color = const Color.fromRGBO(243, 243, 243, 0.937);
+              } else {
+                 color =const Color.fromRGBO(243, 243, 243, 0.237);
+              }
+
               return FutureBuilder(
                   future: apiE!.getBodyPartList(),
                   builder: (cintext, AsyncSnapshot snapshot) {
@@ -181,8 +188,7 @@ Widget trainingWidget(context) {
                             child: Container(
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  color: const Color.fromRGBO(
-                                      243, 243, 243, 0.937)),
+                                  color: color),
                               margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                               padding:
                                   const EdgeInsets.fromLTRB(20, 18, 20, 18),
@@ -191,8 +197,7 @@ Widget trainingWidget(context) {
                               child: Container(
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
-                                    color: const Color.fromRGBO(
-                                        243, 243, 243, 0.937)),
+                                    color: color),
                                 margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                                 padding:
                                     const EdgeInsets.fromLTRB(20, 18, 20, 18),

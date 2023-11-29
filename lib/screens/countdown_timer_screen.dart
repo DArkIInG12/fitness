@@ -135,7 +135,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
                         icono: const Icon(Icons.done),
                         onClick: () {
                           model.updateIndexImage();
-                          if (model.currentImageIndex == model.items - 1) {
+                          if (model.currentImageIndex == model.items-1) {
                             
                             model.isPaused = true;
                             var cal =

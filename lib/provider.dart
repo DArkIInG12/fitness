@@ -5,11 +5,17 @@ class ProviderModel with ChangeNotifier {
   int _indexOld = 0, _indexNew = 0;
   DateTime _selected = DateTime.now();
   DateTime _focused = DateTime.now();
+  bool _darkmode = false;
 
   Map<DateTime, List<dynamic>> _datesmap = {};
   Map<DateTime, List<dynamic>> get datesmap => _datesmap;
   set datesmap(Map<DateTime, List<dynamic>> value) {
     _datesmap = value;
+  }
+
+  bool get darkmode => _darkmode;
+  set darkmode(bool value) {
+    _darkmode = value;
   }
 
   DateTime get selected => _selected;
