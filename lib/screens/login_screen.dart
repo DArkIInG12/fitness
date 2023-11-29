@@ -5,6 +5,7 @@ import 'package:fitness/firebase/google_auth.dart';
 import 'package:fitness/provider.dart';
 import 'package:fitness/screens/dashboard_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -245,7 +246,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: ButtonStyle(
                           minimumSize:
                               MaterialStateProperty.all(const Size(400, 50))),
-                      child: const Text("LOGIN")),
+                      child: Text(
+                        "LOGIN",
+                        style: GoogleFonts.poppins(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      )),
                   const SizedBox(
                     height: 20,
                   ),
