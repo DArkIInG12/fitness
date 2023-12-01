@@ -7,6 +7,7 @@ class CountdownModel extends ChangeNotifier {
   int seconds;
   int items;
   int _currentImageIndex = 0;
+  int _secondsSeconds = 0;
   int _secondsRemaining = 1;
   int _secondsIncrease = 0;
   bool _isPaused = false;
@@ -22,6 +23,11 @@ class CountdownModel extends ChangeNotifier {
   bool get isDiferent2Zero => _isDiferent2Zero;
   int get currentImageIndex => _currentImageIndex;
   int get secondsIncrease => _secondsIncrease;
+  int get secondsSeconds => _secondsSeconds;
+
+  set secondsSeconds(int value) {
+    _secondsSeconds = value;
+  }
 
   CountdownModel({required this.seconds, required this.items}) {
     _secondsRemaining = seconds;
@@ -32,6 +38,7 @@ class CountdownModel extends ChangeNotifier {
     _timerup = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!_isPaused) {
         _secondsIncrease++;
+        _secondsSeconds++;
         notifyListeners();
       }
     });

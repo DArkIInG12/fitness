@@ -303,7 +303,7 @@ List<GDBData> getBarData(
   }
 
   return data;
-}
+} 
 
 class GDCData {
   GDCData(this.field, this.value, this.color);

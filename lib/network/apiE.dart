@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ApiE {
-  var XRapidAPIKey = 'bb2969992emshb7859467ab7c730p17e0c9jsn508a2968e6a3';
+  var XRapidAPIKey = '8e262c31e0msh4fc545b3627341ep1731acjsn444aa3468e24';
   var XRapidAPIHost = 'exercisedb.p.rapidapi.com';
 
   Future<List<dynamic>> getBodyPartList() async {

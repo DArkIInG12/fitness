@@ -6,6 +6,7 @@ import 'package:fitness/widgets/button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
 
 class CountdownTimer extends StatefulWidget {
   const CountdownTimer({super.key});
@@ -16,6 +17,10 @@ class CountdownTimer extends StatefulWidget {
 
 class _CountdownTimerState extends State<CountdownTimer> {
   ExercisesFirebase? bd;
+  List<dynamic> timesE = [];
+  bool flagIndex = false;
+
+  List<int> reps =[];
 
   String timeparse(int seconds) {
     if (seconds <= 9) {
@@ -45,14 +50,16 @@ class _CountdownTimerState extends State<CountdownTimer> {
   int indexImages = 0;
   @override
   Widget build(BuildContext context) {
-  var provider = Provider.of<ProviderModel>(context);
+    var provider = Provider.of<ProviderModel>(context);
     bd = ExercisesFirebase();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
     images = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-
+    for (var i = 0; i < images!['excercices']['list']!.length; i++) {
+      reps.add(images!['excercices']['list'][i].reps);
+    }
     return Scaffold(
       body: ChangeNotifierProvider(
         create: (context) => CountdownModel(
@@ -91,7 +98,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
                 Text(
                   model.isDiferent2Zero
                       ? images!['excercices']['list'][indexImages].name
-                      : 'x ${images!['excercices']['list'][indexImages].reps.toString()} times',
+                      : 'x ${reps[indexImages].toString()} times',
                   style: const TextStyle(
                       fontWeight: FontWeight.bold, fontSize: 20),
                 ),
@@ -135,8 +142,13 @@ class _CountdownTimerState extends State<CountdownTimer> {
                         icono: const Icon(Icons.done),
                         onClick: () {
                           model.updateIndexImage();
-                          if (model.currentImageIndex == model.items-1) {
-                            
+                          timesE.add(
+                              images!['excercices']['list'][indexImages].name);
+                          timesE.add(model.secondsSeconds);
+                          timesE.add(Color((math.Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0));
+                          model.secondsSeconds = 0;
+                          if (flagIndex == true) {
+                            print('Tiempos ejercicio: $timesE');
                             model.isPaused = true;
                             var cal =
                                 ((model.secondsIncrease * model.items) / 60)
@@ -156,10 +168,14 @@ class _CountdownTimerState extends State<CountdownTimer> {
                             Navigator.pushNamed(context, '/finalE', arguments: {
                               'time': timeparse(model.secondsIncrease),
                               'num': model.items,
+                              'timesE': timesE,
                               'cal': cal,
                               'bodyPart': images!['excercices']['bodyPart'],
                               'level': images!['excercices']['level'],
                             });
+                          }
+                          if (model.currentImageIndex == model.items - 1) {
+                            flagIndex = true;
                           }
                         },
                         backgroundColor: const Color.fromRGBO(0, 238, 65, 1),

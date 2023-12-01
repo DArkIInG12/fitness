@@ -3,6 +3,7 @@ import 'package:fitness/global_values.dart';
 import 'package:fitness/network/apiE.dart';
 import 'package:fitness/provider.dart';
 import 'package:fitness/widgets/button_widget.dart';
+import 'package:fitness/widgets/report_widget.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,6 +22,7 @@ class _FinalExcerciceScreenState extends State<FinalExcerciceScreen> {
   ApiE? apiE;
   ScrollController? _scrollController;
   Color? color, container;
+  List<dynamic>? dataG;
 
   @override
   void initState() {
@@ -43,6 +45,7 @@ class _FinalExcerciceScreenState extends State<FinalExcerciceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    TooltipBehavior tooltipBehavior = TooltipBehavior();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -52,11 +55,13 @@ class _FinalExcerciceScreenState extends State<FinalExcerciceScreen> {
     apiE = ApiE();
     arguments =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    dataG = arguments!['timesE'];
     return WillPopScope(
       onWillPop: () async {
         return false;
       },
       child: Scaffold(
+          resizeToAvoidBottomInset: false,
           backgroundColor:
               GlobalValues.darkTheme.value ? Colors.black : Colors.white,
           body: NestedScrollView(
@@ -207,23 +212,66 @@ class _FinalExcerciceScreenState extends State<FinalExcerciceScreen> {
                                   ],
                                 )
                               ],
-                            )
+                            ),
                           ],
                         ),
                       ),
+                      const SizedBox(
+                        height: 40,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: container),
+                        width: double.infinity,
+                        child: SfCircularChart(
+                          title: ChartTitle(
+                              text: 'Body Part Exercises Time Worked (minutes)',
+                              textStyle: const TextStyle(
+                                  fontSize: 17, fontWeight: FontWeight.bold)),
+                      legend: const Legend(
+                      isVisible: true,
+                      overflowMode: LegendItemOverflowMode.scroll,
+                      title: LegendTitle(
+                          text: 'Exercises',
+
+                          textStyle: TextStyle(fontWeight: FontWeight.bold))),
+                          tooltipBehavior: tooltipBehavior,
+                          series: <CircularSeries>[
+                            PieSeries<GDLData, String>(
+                                dataSource: getLData(dataG!),
+                                xValueMapper: (GDLData data, _) =>
+                                    data.field.toUpperCase(),
+                                yValueMapper: (GDLData data, _) => data.value,
+                                pointColorMapper: (GDLData data,_) => data.color,
+                                dataLabelMapper: (GDLData data,_) => timeparse(data.value.toInt()) ,
+                                dataLabelSettings: const DataLabelSettings(
+                                    isVisible: true,
+                                    useSeriesColor: true,
+                                    labelPosition: ChartDataLabelPosition.inside,
+                                    borderWidth: 1))
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: ButtonWidget(
+                                text: 'Next',
+                                onClick: () {
+                                  Navigator.pushNamed(context, '/dashboard');
+                                },
+                                backgroundColor:
+                                    const Color.fromRGBO(0, 0, 255, 1),
+                                icono: const Icon(Icons.skip_next)),
+                          ),
+                        ],
+                      )
                     ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: ButtonWidget(
-                      text: 'Next',
-                      onClick: () {
-                        Navigator.pushNamed(context, '/dashboard');
-                      },
-                      backgroundColor: const Color.fromRGBO(0, 0, 255, 1),
-                      icono: const Icon(Icons.skip_next)),
-                )
               ],
             ),
           )),
@@ -231,16 +279,19 @@ class _FinalExcerciceScreenState extends State<FinalExcerciceScreen> {
   }
 }
 
-List<GDLData> getLData(List<Map<String, dynamic>> list) {
+List<GDLData> getLData(List<dynamic> list) {
   List<GDLData> data = [];
   for (var i = 0; i < list.length; i++) {
-    data.add(GDLData(list[i]['date'], double.parse(list[i]['calories'])));
+    data.add(GDLData(list[i], list[i + 1].toDouble(), list[i + 2]));
+    i++;
+    i++;
   }
   return data;
 }
 
 class GDLData {
-  GDLData(this.field, this.value);
+  GDLData(this.field, this.value, this.color);
   final String field;
   final double value;
+  final Color color;
 }
