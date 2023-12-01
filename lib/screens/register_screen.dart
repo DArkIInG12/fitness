@@ -1,6 +1,7 @@
 import 'package:fitness/firebase/email_auth.dart';
 import 'package:fitness/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -183,7 +184,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       style: ButtonStyle(
                           minimumSize:
                               MaterialStateProperty.all(const Size(400, 50))),
-                      child: const Text("REGISTER")),
+                      child: Text("REGISTER",
+                          style: GoogleFonts.poppins(
+                              fontSize: 18, fontWeight: FontWeight.bold))),
                 ]),
               ),
             ],
